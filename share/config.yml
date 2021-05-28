@@ -5,7 +5,7 @@
 # === Basic configuration ===
 
 # Your application's name
-appname: "Waltz"
+appname: "testapp"
 
 # The default layout to use for your application (located in
 # views/layouts/main.tt)

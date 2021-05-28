@@ -1,0 +1,8 @@
+<div class="navbar-hero">
+	<nav>
+		{{ range $k, $v := $.Site.Params.menu }}
+			{{ if $k }}&nbsp&nbsp•&nbsp&nbsp{{ end }}
+			<a href="{{ $v.link | relURL }}">{{ $v.text }}</a>
+		{{ end }}
+	</nav>
+</div>
