@@ -1,4 +1,8 @@
-requires "Dancer2" => "0.301002";
+requires "Dancer2"                => "0.301002";
+requires "Text::Table::Tiny"      => "0";
+requires "App::Wallflower"        => "0";
+requires "Plack::Loader::Shotgun" => "0";
+requires "CLI::Osprey"            => "0";
 
 recommends "YAML"                    => "0";
 recommends "URL::Encode::XS"         => "0";
