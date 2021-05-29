@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
+use strictures 2;
 use Waltz::App;
 use Plack::Runner;
 use Plack::Loader::Restarter;
