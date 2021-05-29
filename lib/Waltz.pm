@@ -1,10 +1,12 @@
 package Waltz;
-use Dancer2;
 
-our $VERSION = '0.1';
+our $VERSION = '0.1.0';
 
-get '/' => sub {
-    template 'index' => { 'title' => 'Waltz' };
-};
+1;
 
-true;
+__END__
+
+=pod
+
+=cut
+
