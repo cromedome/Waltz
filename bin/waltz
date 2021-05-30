@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+
+use strictures 2;
+use Waltz::CLI;
+
+Waltz::CLI->new_with_options->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+waltz - Waltz command line interface
+
+=head1 SYNOPSIS
+
+waltz <command> [options...]
+
+=head1 DESCRIPTION
+
+Waltz is a static site generator and site prototyping tool. In many 
+respects, it is like Hugo for static site generation, and resembles
+Middleman for application prototyping. Unlike those tools, Waltz provides
+an easy upgrade path to a full-blown application development framework. 
+
+Waltz is built with L<Dancer2>, and bootstrapping a site built with 
+Waltz promotes it to a bona fide Dancer2 application. From there, the
+sky is the limit!
+
+=head2 Documentation Index
+
+Documentation on Waltz is split into several manpages. Below is a
+complete outline on where to go for help.
+
+=over 4
+
+=item * Waltz Tutorial
+
+If you are just learning how to Waltz, you should start by reading
+the L<Waltz::Manual::Tutorial>.
+
+=item * Growing with Waltz
+
+L<Waltz::Manual::Growing> explains how to take a static site or prototype built
+with Waltz and grow it into a fully-fledged L<Dancer2> application.
+
+=item * Waltz Manual
+
+L<Waltz::Manual> is the complete reference for Waltz. Here you will find
+detailed information on the concepts of Waltz site development.
+
+=item * Waltz Deployment
+
+For configuration examples of different deployment solutions involving
+Waltz and Plack, refer to L<Waltz::Manual::Deployment>.
+
+=item * Waltz Cookbook
+
+Specific examples for tackling real-life problems, as well as tips and 
+'tricks', see L<Waltz::Manual::Cookbook>
+
+=item * Waltz Config
+
+For information on how to configure Waltz, refer to L<Waltz::Manual::Config>.
+
+=item * Waltz Migration guide
+
+L<Waltz::Manual::Migration> explains how to migrate to Waltz from Hugo
+and other blogging platforms.
+
+=back
+
+=head1 COMMANDS
+
+=over
+
+=item * version               
+
+Display version of Waltz currently installed.
+
+=back
+
+To get detailed description of each individual command run:
+    
+    waltz <command> --help
+
+The latest list of available commands can be displayed by:
+    
+    waltz 
+
+=head1 AUTHOR
+
+Jason A. Crome  
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Jason A. Crome.
+
+This  is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5  programming  language  system
+itself.
+
+=cut
+
