@@ -14,6 +14,7 @@ sub run {
     my $runner = Plack::Runner->new;
 
     $runner->{ loader } = 'Restarter';
+    # TODO: Monitor content directories, not code!
     $runner->loader->watch( 'lib', 'bin' );
     $runner->run( $app );
 }
