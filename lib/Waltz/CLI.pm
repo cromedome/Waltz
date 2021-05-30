@@ -12,7 +12,7 @@ subcommand version   => 'Waltz::CLI::Version';
 #subcommand site      => 'Waltz::CLI::Site';
 #subcommand page      => 'Waltz::CLI::Page';
 #subcommand publish   => 'Waltz::CLI::Publish';
-#subcommand dev       => 'Waltz::CLI::Dev';
+subcommand dev       => 'Waltz::CLI::Dev';
 #subcommand bootstrap => 'Waltz::CLI::Bootstrap';
 
 # Thinking ahead, these might be useful in future subcommands
