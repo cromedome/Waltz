@@ -15,9 +15,9 @@
 
 </head>
 <body>
-<% content %>
-<div id="footer">
-Powered by <a href="http://perldancer.org/">Dancer2</a> <% dancer_version %>
-</div>
+    {{ content }} 
+    <div id="footer">
+        Powered by <a href="http://perldancer.org/">Dancer2</a> <% dancer_version %>
+    </div>
 </body>
 </html>
