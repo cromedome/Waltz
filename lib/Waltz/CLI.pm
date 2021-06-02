@@ -9,9 +9,10 @@ use Module::Runtime 'use_module';
 subcommand version   => 'Waltz::CLI::Version';
 #subcommand validate  => 'Waltz::CLI::Validate';
 #subcommand search    => 'Waltz::CLI::Search';
-#subcommand site      => 'Waltz::CLI::Site';
-#subcommand page      => 'Waltz::CLI::Page';
-#subcommand publish   => 'Waltz::CLI::Publish';
+#subcommand init      => 'Waltz::CLI::Init';
+#subcommand create    => 'Waltz::CLI::Create';
+#subcommand publish   => 'Waltz::CLI::Publish'; # Create static content
+#subcommand deploy    => 'Waltz::CLI::Deploy'; # Implies publish. Push to render, Netlify, GitHub, etc.
 subcommand dev       => 'Waltz::CLI::Dev';
 #subcommand bootstrap => 'Waltz::CLI::Bootstrap';
 
