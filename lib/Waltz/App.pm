@@ -1,31 +1,36 @@
 package Waltz::App;
 
-use Dancer2;
+use v5.20;
 use strictures 2;
 use experimental 'signatures';
 
+use Dancer2;
 use Cwd;
 use Path::Tiny;
 use Text::Markdown 'markdown';
 use Waltz;
+
 use Data::Printer;
 
 # The goal here is to pigeon hole us into our site content directory. I am not
-# sure yet about letting a user spefify what directory they want content to
+# sure yet about letting a user specify what directory they want content to
 # come from. Seems a bit dangerous. 
-#BEGIN {
-    #my $cwd = getcwd; 
-    #debug "CWD IS $cwd";
-    
-    #$ENV{ DANCER_CONFDIR } = $cwd;
-    #$ENV{ DANCER_VIEWS   } = "$cwd/views";
+#set appdir => '/Users/jason/src/Waltz/app/share/';
+#set confdir => '/Users/jason/src/Waltz/app/share/';
+#set views => '/Users/jason/src/Waltz/app/share/views';
+#set public_dir => '/Users/jason/src/Waltz/app/share/static';
+#set static_handler => true;
 
-    ## This needs to change when we go to publish. Then again, maybe not. TBD.
-    #$ENV{ DANCER_PUBLIC } = "$cwd/static";
-#}
+prepare_app {
+    my $cwd = getcwd; 
+    say "Waltzing in $cwd...";
 
-# This seems good for development, not sure if it will stick around for the
-# long haul.
+    my @files = $_[0]->config_files->@*;
+    say 'Watching ' . join( ',', @files ) . ' for file updates.';
+};
+
+# These next few routes seem good for development, not sure if they will stick
+# around for the long haul.
 get '/version' => sub { return 'Version ' . $Waltz::VERSION; };
 
 get '/settings' => sub {
@@ -41,9 +46,15 @@ get '/' => sub {
     template 'index' => { 'title' => 'Waltz' };
 };
 
+# Here's the crux of the development server app. Look for a markdown file
+# with the name and relative path provided, parse the metadata, render 
+# the markdown as HTML, and wrap it all in our layout and templating 
+# engine.
 get '/**' => sub {
     my( $route ) = splat;
-    my $base = '/Users/jason/src/Waltz/test.cromedome.blog/content/';
+
+    my $cwd  = getcwd;
+    my $base = "$cwd/content/";
     my $file = join( '/', $route->@* ) . '.md';
     my $text = path( $base . $file )->slurp_utf8;
     return markdown( $text );

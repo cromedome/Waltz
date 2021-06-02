@@ -1,24 +1,23 @@
 #!/usr/bin/env perl
 
+use v5.20;
 use strictures 2;
-use Waltz::CLI;
+
 use Cwd;
+use Waltz::CLI;
 
 BEGIN {
     my $cwd = getcwd; 
-    say STDERR "CWD IS $cwd";
     
+    $ENV{ DANCER_APPDIR  } = $cwd;
     $ENV{ DANCER_CONFDIR } = $cwd;
     $ENV{ DANCER_VIEWS   } = "$cwd/views";
 
     # This needs to change when we go to publish. Then again, maybe not. TBD.
-    $ENV{ DANCER_PUBLIC } = "$cwd/static";
-
-    $ENV{ DANCER_CONFIG_VERBOSE } = 1;
+    #$ENV{ DANCER_PUBLIC } = "$cwd/static";
 }
 
-say STDERR 'Waltz settings:';
-say STDERR '- Config location: ' . $ENV{ DANCER_CONFDIR };
+say 'TODO: render static content. Serving dynamically.';
 
 Waltz::CLI->new_with_options->run;
 
