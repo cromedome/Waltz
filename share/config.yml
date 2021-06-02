@@ -43,6 +43,6 @@ engines:
             # Note: start_tag and end_tag are regexes
             #start_tag: '[%'
             #end_tag:   '%]'
-            start_tag: '{{'
-            end_tag:   '}}'
+            start_tag: '\{\{'
+            end_tag:   '\}\}'
 
