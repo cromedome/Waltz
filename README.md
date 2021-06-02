@@ -24,3 +24,30 @@ PERL5LIB=../lib DANCER_CONFDIR=. DANCER_VIEWS=views/ ../bin/waltz dev
 That's not a great real world example however. I will provide a better
 one when I have a bona fide test repository based on Hugo content ready
 to server.
+
+## Roadmap
+This is highly subject to change:
+* Add site configuration to templates
+* When running the server, generate static content from markdown files.
+* When content changes, regenerate files that have been changed.
+* Tests
+* Metadata validation from the CLI
+* Generate category, tag, recent pages from generate
+* Typesense or Algolia (preferred) search
+* Widgets:
+    * Categories, tags, Recent Entries widgets
+    * Widget to show all posts, all for category, all for tag
+    * Basic analytics components
+    * Disqus widget
+    * Social sharing widget
+* Marketing site
+* Release 1.0
+* Profit! (not)
+
+After 1.0:
+* Pagination
+* Themes
+* Hugo migration tool
+* CLI search tool
+* Consider Xslate migration
+* App bootstrapping
