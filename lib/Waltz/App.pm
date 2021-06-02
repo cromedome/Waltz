@@ -7,6 +7,7 @@ use experimental 'signatures';
 use Dancer2;
 use Cwd;
 use Path::Tiny;
+use YAML qw( Load );
 use Text::Markdown 'markdown';
 use Waltz;
 
@@ -34,12 +35,11 @@ prepare_app {
 get '/version' => sub { return 'Version ' . $Waltz::VERSION; };
 
 get '/settings' => sub {
-    debug "VIEWS ARE " . $ENV{ DANCER_VIEWS };
-    my @views = setting( 'views' ); p @views;
-    my @public = setting( 'public_dir' ); p @public;
+    my @views  = setting( 'views' );
+    my @public = setting( 'public_dir' );
     return 'Settings:<br>' .
-        'Views: ' . setting 'views',
-        'Static dir: ' . setting 'public_dir';
+        'Views: ' . join( ', ', setting 'views' ) . '<br>' . 
+        'Static dir: ' . join( ', ', setting 'public_dir' );
 };
 
 get '/' => sub {
@@ -57,7 +57,11 @@ get '/**' => sub {
     my $base = "$cwd/content/";
     my $file = join( '/', $route->@* ) . '.md';
     my $text = path( $base . $file )->slurp_utf8;
-    return markdown( $text );
+    my @data = split( /---\n/, $text ); shift @data;
+    my $yaml = Load( $data[0] );
+    my $md   = $data[1]; chomp $md; $md =~ s/^\s+//gm;
+
+    template 'blog', { output => markdown( $data[1] ) };
 };
 
 true;
