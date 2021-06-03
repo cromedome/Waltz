@@ -1,30 +1,44 @@
 # === Basic configuration ===
-
 site:
-  # Your sites's name
-  appname: "testblog"
+    # Your sites's name
+    appname: "testblog"
 
-  # Blog title
-  title: 'A Test Blog'
+    # Blog title
+    title: 'A Test Blog'
 
-  # Author name
-  author: 'John Doe'
-  
-  # Avatar filename/URL
-  avatar: 'gravatar'
+    appname: "cromedome.blog"
+    title: 'cromedome.blog - the ramblings of Jason A. Crome'
+    paginate: 5
+    copyright: "Copyright &copy; Jason A. Crome 2001-2021"
+    license: ""
+    comment_count: true
+    gdpr: false
 
-    # Hero image/URL
-  hero: "something.png"
+author:
+    # Avatar filename/URL, or gravatar
+    avatar: 'gravatar'
 
-  copyright: " "
+    # Hero image URL
+    hero: ""
 
-social:
-    github: "PerlDancer"
-    twitter: "PerlDancer"
-    linkedin: none
-    facebook: none
-    instagram: none
+    # Biographical info
+    name: 'John Doe'
+    bio: "Someone of remarkable character"
+    location: "Smallville, Your State, USA"
 
+    social:
+        github: "PerlDancer"
+        twitter: "PerlDancer"
+        linkedin: none
+        facebook: none
+        instagram: none
+
+# === Widget configuration ===
+widgets:
+    disqus:
+        shortname: test
+
+# === Waltz/Dancer specific - don't change unless you know what you're doing! ===
 # The default layout to use for your application (located in
 # views/layouts/main.tt)
 layout: "main"
@@ -34,8 +48,7 @@ layout: "main"
 # about unicode within your app when this setting is set (recommended).
 charset: "UTF-8"
 
-# === Engines ===
-
+# Engine config
 template: "template_toolkit"
 engines:
     template:
