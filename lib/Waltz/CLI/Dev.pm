@@ -17,7 +17,7 @@ sub run {
     say 'TODO: render static content. Serving dynamically.';
 
     $runner->{ loader } = 'Restarter';
-    $runner->loader->watch( 'content', 'prototypes', 'views' );
+    $runner->loader->watch( 'config.yml', 'content', 'prototypes', 'views' );
     $runner->run( $app );
 }
 
