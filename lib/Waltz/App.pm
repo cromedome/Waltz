@@ -65,8 +65,10 @@ get '/**' => sub {
 
     # TODO: Make permalink
     # TODO: Footer, disable comments locally
+    # TODO: configurable prototype
     template 'blog', { 
         site      => config->{ site },
+        menu      => config->{ menu },
         post      => $yaml,
         author    => config->{ author },
         widgets   => config->{ widgets },
