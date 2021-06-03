@@ -61,6 +61,8 @@ get '/**' => sub {
     my $yaml = Load( $data[0] );
     my $md   = $data[1]; chomp $md; $md =~ s/^\s+//gm;
 
+    # TODO: add site configuration to templates
+    # TODO: work with front-matter
     template 'blog', { output => markdown( $data[1] ) };
 };
 

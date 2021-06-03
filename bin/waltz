@@ -17,8 +17,6 @@ BEGIN {
     #$ENV{ DANCER_PUBLIC } = "$cwd/static";
 }
 
-say 'TODO: render static content. Serving dynamically.';
-
 Waltz::CLI->new_with_options->run;
 
 __END__
