@@ -6,12 +6,19 @@ site:
     # Blog title
     title: 'A Test Blog'
 
-    appname: "cromedome.blog"
-    title: 'cromedome.blog - the ramblings of Jason A. Crome'
+    # Coyright information
+    copyright: "Copyright &copy; 2021. All rights reserved."
+
+    # Number of items per page
     paginate: 5
-    copyright: "Copyright &copy; Jason A. Crome 2001-2021"
+
+    # License to use (Apache, Artistic, CC, etc.)
     license: ""
+
+    # Show comment counts
     comment_count: true
+
+    # Show gdpr info?
     gdpr: false
 
 author:
@@ -27,6 +34,7 @@ author:
     location: "Smallville, Your State, USA"
 
     social:
+        sharing: true
         github: "PerlDancer"
         twitter: "PerlDancer"
         linkedin: none
