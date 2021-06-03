@@ -46,6 +46,7 @@ This is highly subject to change:
 
 After 1.0:
 * Pagination
+* RSS
 * Themes
 * Hugo migration tool
 * CLI search tool
