@@ -13,6 +13,8 @@ use Waltz;
 
 use Data::Printer;
 
+# TODO: Template::AutoFilter
+
 # The goal here is to pigeon hole us into our site content directory. I am not
 # sure yet about letting a user specify what directory they want content to
 # come from. Seems a bit dangerous. 
@@ -61,9 +63,16 @@ get '/**' => sub {
     my $yaml = Load( $data[0] );
     my $md   = $data[1]; chomp $md; $md =~ s/^\s+//gm;
 
-    # TODO: add site configuration to templates
-    # TODO: work with front-matter
-    template 'blog', { output => markdown( $data[1] ) };
+    # TODO: Make permalink
+    # TODO: Footer, disable comments locally
+    template 'blog', { 
+        site      => config->{ site },
+        post      => $yaml,
+        author    => config->{ author },
+        widgets   => config->{ widgets },
+        output    => markdown( $data[1] ),
+        permalink => request->uri,
+    };
 };
 
 true;
