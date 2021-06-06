@@ -1,17 +1,14 @@
 package Waltz::App;
 
 use v5.20;
-use strictures 2;
-use experimental 'signatures';
-no warnings 'experimental::signatures';
-
 use Dancer2;
-use Cwd;
-#use Path::Tiny;
-#use YAML qw( Load );
-#use Text::Markdown 'markdown';
-use Waltz;
+use strictures 2;
+no warnings qw( experimental::signatures );
+use feature qw( signatures );
 
+use Cwd;
+use Waltz;
+use Waltz::Renderer;
 use Data::Printer;
 
 # TODO: Template::AutoFilter
@@ -25,9 +22,12 @@ use Data::Printer;
 #set public_dir => '/Users/jason/src/Waltz/app/share/static';
 #set static_handler => true;
 
+state $renderer;
 prepare_app {
     my $cwd = getcwd; 
     say "Waltzing in $cwd...";
+
+    $renderer = Waltz::Renderer->new({ basedir => $cwd });
 
     my @files = $_[0]->config_files->@*;
     say 'Watching ' . join( ',', @files ) . ' for file updates.';
@@ -57,27 +57,12 @@ get '/**' => sub {
     my( $route ) = splat;
 
     ## TODO: skip static, public
-    #my $cwd  = getcwd;
-    #my $base = "$cwd/content/";
-    #my $file = join( '/', $route->@* ) . '.md';
-    #my $text = path( $base . $file )->slurp_utf8;
-    #my @data = split( /---\n/, $text ); shift @data;
-    #my $yaml = Load( $data[0] );
-    #my $md   = $data[1]; chomp $md; $md =~ s/^\s+//gm;
-
-    ## TODO: Make permalink
-    ## TODO: Footer, disable comments locally
-    ## TODO: configurable prototype
-    ## TODO: set page title
-    #template 'blog', { 
-        #site      => config->{ site },
-        #menu      => config->{ menu },
-        #post      => $yaml,
-        #author    => config->{ author },
-        #widgets   => config->{ widgets },
-        #output    => markdown( $data[1] ),
-        #permalink => request->uri,
-    #};
+    my $page = $renderer->render({
+        config   => config,
+        uri      => request->uri,
+        filename => join( '/', $route->@* ),
+    });
+    template $page->{ prototype }, $page;
 };
 
 true;

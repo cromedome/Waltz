@@ -1,62 +1,65 @@
 package Waltz::Renderer;
 
 use v5.20;
-use strictures 2;
-use experimental 'signatures';
-no warnings 'experimental::signatures';
-
 use Moo;
+use strictures 2;
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
+
 use Cwd;
+use Template;
 use Path::Tiny;
 use YAML qw( Load );
 use Text::Markdown 'markdown';
-use Template;
+use Data::Printer;
 
 has basedir => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { getcwd(); },
 );
 
-sub render( $filename ) {
-    my $template = Template->new({ INCLUDE_PATH => [ 'templates/', 'views/' ]});
+# Render a single file as markdown, return a hashref with the content and
+# metadata.
+sub render( $self, $args ) {
+    my $filename = $args->{ filename };
+    my $config   = $args->{ config };
+    my $uri      = $args->{ uri };
 
-    my $cwd  = getcwd;
-    my $base = "$cwd/content/";
-    my $file = "${filename}.md";
-    my $text = path( $base . $file )->slurp_utf8;
-    my @data = split( /---\n/, $text ); shift @data;
-    my $yaml = Load( $data[0] );
-    my $md   = $data[1]; chomp $md; $md =~ s/^\s+//gm;
+    my $markdown_base = $self->basedir . '/content/';
+    my ($file)        = $filename =~ /\.md$/ ? $filename : "${filename}.md";
+    # TODO: -e file
+    my $raw_content   = path( $markdown_base . $file )->slurp_utf8;
+    my @page_pieces   = split( /---\n/, $raw_content ); shift @page_pieces; # First element always empty, discard it
+    my $frontmatter   = Load( $page_pieces[0] );
+    my $markdown      = $page_pieces[1]; chomp $markdown; $markdown =~ s/^\s+//gm;
 
     # TODO: Make permalink
     # TODO: Footer, disable comments locally
-    # TODO: configurable prototype
-    # TODO: set page title
-    template 'blog', { 
-        site      => config->{ site },
-        menu      => config->{ menu },
-        post      => $yaml,
-        author    => config->{ author },
-        widgets   => config->{ widgets },
-        output    => markdown( $data[1] ),
-        permalink => request->uri,
+    return {
+        prototype => $frontmatter->{ prototype } // 'default',
+        title     => $frontmatter->{ title } . ' - ' . $config->{ site }{ title },
+        site      => $config->{ site },
+        menu      => $config->{ menu },
+        post      => $frontmatter,
+        author    => $config->{ author },
+        widgets   => $config->{ widgets },
+        output    => markdown( $markdown ),
+        permalink => $uri,
     };
+}
 
-    # File output
-    $template->process(
-        $page->{ page } . '.tt',
-        $vars,
-        "public/${name}.html",
-    );
+sub render_all( $self ) {
+    #my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]});
 
-    # Scalar output
-    $template->process(
-        'calendar_script.tt', {
-            events => \@calendar_events,
-        },
-        \my $script,
-    );
-};
+    ## File output
+    #$template->process(
+        #$page->{ page } . '.tt',
+        #$vars,
+        #"public/${name}.html",
+    #);
+
+    return $self->render;
+}
 
 1;
 
