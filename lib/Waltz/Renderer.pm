@@ -7,6 +7,8 @@ use feature qw( signatures );
 no warnings qw( experimental::signatures );
 
 use Cwd;
+use URI;
+use Carp qw( carp croak );
 use Template;
 use Path::Tiny;
 use YAML qw( Load );
@@ -18,23 +20,32 @@ has basedir => (
     default => sub { getcwd(); },
 );
 
+has config => (
+    is      => 'ro',
+    default => {},
+);
+
 # Render a single file as markdown, return a hashref with the content and
 # metadata.
 sub render( $self, $args ) {
-    my $filename = $args->{ filename };
-    my $config   = $args->{ config };
-    my $uri      = $args->{ uri };
+    my $filename = $args->{ filename } or croak "render(): need a filename to render!";
 
+    my $config   = $args->{ config }   or croak "render(): missing blog configuration!";
+    # TODO: check for existing config, then one passed
+
+    my $uri      = $args->{ uri }      or carp  "render(): Missing URI, can't generate permalink!";
+    
     my $markdown_base = $self->basedir . '/content/';
     my ($file)        = $filename =~ /\.md$/ ? $filename : "${filename}.md";
-    # TODO: -e file
-    my $raw_content   = path( $markdown_base . $file )->slurp_utf8;
+    $file             = "$markdown_base$file";
+    croak "render(): File $file not found!" unless -e $file;
+
+    my $raw_content   = path( $file )->slurp_utf8;
     my @page_pieces   = split( /---\n/, $raw_content ); shift @page_pieces; # First element always empty, discard it
     my $frontmatter   = Load( $page_pieces[0] );
     my $markdown      = $page_pieces[1]; chomp $markdown; $markdown =~ s/^\s+//gm;
 
     # TODO: Make permalink
-    # TODO: Footer, disable comments locally
     return {
         prototype => $frontmatter->{ prototype } // 'default',
         title     => $frontmatter->{ title } . ' - ' . $config->{ site }{ title },
@@ -46,6 +57,13 @@ sub render( $self, $args ) {
         output    => markdown( $markdown ),
         permalink => $uri,
     };
+}
+
+sub permalink( $self, $path ) {
+    # TODO: config check
+    # TODO: valid site base
+    # TODO: valid URI
+    # TODO: Move missing check here
 }
 
 sub render_all( $self ) {

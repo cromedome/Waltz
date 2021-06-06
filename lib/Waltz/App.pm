@@ -27,7 +27,7 @@ prepare_app {
     my $cwd = getcwd; 
     say "Waltzing in $cwd...";
 
-    $renderer = Waltz::Renderer->new({ basedir => $cwd });
+    $renderer = Waltz::Renderer->new({ basedir => $cwd config => config });
 
     my @files = $_[0]->config_files->@*;
     say 'Watching ' . join( ',', @files ) . ' for file updates.';

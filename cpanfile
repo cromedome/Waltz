@@ -6,6 +6,7 @@ requires "App::Wallflower"        => "0";
 requires "CLI::Osprey"            => "0";
 requires "Path::Tiny"             => "0";
 requires "Moo"                    => "0";
+requires "URI"                    => "0";
 
 recommends "YAML"                    => "0";
 recommends "URL::Encode::XS"         => "0";
