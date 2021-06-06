@@ -7,6 +7,7 @@ no warnings qw( experimental::signatures );
 use feature qw( signatures );
 
 use Cwd;
+use Feature::Compat::Try;
 use Waltz;
 use Waltz::Renderer;
 use Data::Printer;
@@ -27,7 +28,7 @@ prepare_app {
     my $cwd = getcwd; 
     say "Waltzing in $cwd...";
 
-    $renderer = Waltz::Renderer->new({ basedir => $cwd config => config });
+    $renderer = Waltz::Renderer->new({ basedir => $cwd, config => config });
 
     my @files = $_[0]->config_files->@*;
     say 'Watching ' . join( ',', @files ) . ' for file updates.';
@@ -56,12 +57,22 @@ get '/' => sub {
 get '/**' => sub {
     my( $route ) = splat;
 
-    ## TODO: skip static, public
-    my $page = $renderer->render({
-        config   => config,
-        uri      => request->uri,
-        filename => join( '/', $route->@* ),
-    });
+    my $page = do{
+        try {
+            $renderer->render({
+                uri      => request->uri,
+                filename => join( '/', $route->@* ),
+            });
+        } catch( $e ) {
+            error $e;
+            if( $e =~ /^render.+not found!/ ) {
+                status 'not_found';
+                return;
+            } else {
+                die $e;
+            }
+        }
+    };
     template $page->{ prototype }, $page;
 };
 
