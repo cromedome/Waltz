@@ -22,19 +22,16 @@ has basedir => (
 
 has config => (
     is      => 'ro',
-    default => {},
+    default => sub{ return {} },
 );
 
 # Render a single file as markdown, return a hashref with the content and
 # metadata.
 sub render( $self, $args ) {
-    my $filename = $args->{ filename } or croak "render(): need a filename to render!";
+    my $config = $args->{ config } // $self->config;  
+    croak "render(): missing blog configuration!" unless $config;
 
-    my $config   = $args->{ config }   or croak "render(): missing blog configuration!";
-    # TODO: check for existing config, then one passed
-
-    my $uri      = $args->{ uri }      or carp  "render(): Missing URI, can't generate permalink!";
-    
+    my $filename      = $args->{ filename } or croak "render(): need a filename to render!";
     my $markdown_base = $self->basedir . '/content/';
     my ($file)        = $filename =~ /\.md$/ ? $filename : "${filename}.md";
     $file             = "$markdown_base$file";
@@ -45,7 +42,7 @@ sub render( $self, $args ) {
     my $frontmatter   = Load( $page_pieces[0] );
     my $markdown      = $page_pieces[1]; chomp $markdown; $markdown =~ s/^\s+//gm;
 
-    # TODO: Make permalink
+    # TODO: date, tags, category
     return {
         prototype => $frontmatter->{ prototype } // 'default',
         title     => $frontmatter->{ title } . ' - ' . $config->{ site }{ title },
@@ -55,15 +52,14 @@ sub render( $self, $args ) {
         author    => $config->{ author },
         widgets   => $config->{ widgets },
         output    => markdown( $markdown ),
-        permalink => $uri,
+        permalink => $self->permalink( $args->{ uri }),
     };
 }
 
 sub permalink( $self, $path ) {
-    # TODO: config check
-    # TODO: valid site base
-    # TODO: valid URI
-    # TODO: Move missing check here
+    my $uri = URI->new_abs( $path, $self->config->{ site }{ url } )
+        or carp "permalink(): Missing URI, can't generate permalink!";
+    return $uri->as_string;
 }
 
 sub render_all( $self ) {

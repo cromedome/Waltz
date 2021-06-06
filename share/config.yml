@@ -1,5 +1,8 @@
 # === Basic configuration ===
 site:
+    # The URL for the site home
+    url: "https://your.blog"
+
     # Your sites's name
     appname: "testblog"
 
