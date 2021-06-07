@@ -42,7 +42,6 @@ sub render( $self, $args ) {
     my $frontmatter   = Load( $page_pieces[0] );
     my $markdown      = $page_pieces[1]; chomp $markdown; $markdown =~ s/^\s+//gm;
 
-    # TODO: date, tags, category
     return {
         prototype => $frontmatter->{ prototype } // 'default',
         title     => $frontmatter->{ title } . ' - ' . $config->{ site }{ title },
