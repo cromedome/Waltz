@@ -10,7 +10,6 @@ use Cwd;
 use Feature::Compat::Try;
 use Waltz;
 use Waltz::Renderer;
-use Data::Printer;
 
 # TODO: Template::AutoFilter
 
@@ -23,6 +22,9 @@ use Data::Printer;
 #set public_dir => '/Users/jason/src/Waltz/app/share/static';
 #set static_handler => true;
 
+# Don't create the renderer any more than we have to. It's not that expensive, 
+# but still... why? If we need to communicate anything to the user at runtime,
+# this is a good place to do it.
 state $renderer;
 prepare_app {
     my $cwd = getcwd; 
@@ -34,24 +36,17 @@ prepare_app {
     say 'Watching ' . join( ',', @files ) . ' for file updates.';
 };
 
-# These next few routes seem good for development, not sure if they will stick
-# around for the long haul.
+# This seems good for development, not sure if it will stick around for the long haul.
 get '/version' => sub { return 'Version ' . $Waltz::VERSION; };
 
-get '/settings' => sub {
-    my @views  = setting( 'views' );
-    my @public = setting( 'public_dir' );
-    return 'Settings:<br>' .
-        'Views: ' . join( ', ', setting 'views' ) . '<br>' . 
-        'Static dir: ' . join( ', ', setting 'public_dir' );
-};
-
+# If we hit the root of the site, make sure we try to render some content. 
+# Unfortunately without this the static renderer will attempt to render
+# something and won't find it, resulting in a 404.
 get '/' => sub { forward '/index'; };
 
-# Here's the crux of the development server app. Look for a markdown file
-# with the name and relative path provided, parse the metadata, render 
-# the markdown as HTML, and wrap it all in our layout and templating 
-# engine.
+# Here's the crux of the development server app. Try to render a markdown
+# file using the path and filename provided as HTML, and wrap it all in
+# our layout and templating engine.
 get '/**' => sub {
     my( $route ) = splat;
 
