@@ -10,9 +10,8 @@ use Cwd;
 use URI;
 use Carp qw( carp croak );
 use Template;
-use Path::Tiny;
-use YAML qw( Load );
-use Text::Markdown 'markdown';
+use File::Serialize { pretty => 1 };
+use Text::Markdown qw( markdown );
 use Data::Printer;
 
 has basedir => (
@@ -33,24 +32,19 @@ sub render( $self, $args ) {
 
     my $filename      = $args->{ filename } or croak "render(): need a filename to render!";
     my $markdown_base = $self->basedir . '/content/';
-    my ($file)        = $filename =~ /\.md$/ ? $filename : "${filename}.md";
-    $file             = "$markdown_base$file";
-    croak "render(): File $file not found!" unless -e $file;
-
-    my $raw_content   = path( $file )->slurp_utf8;
-    my @page_pieces   = split( /---\n/, $raw_content ); shift @page_pieces; # First element always empty, discard it
-    my $frontmatter   = Load( $page_pieces[0] );
-    my $markdown      = $page_pieces[1]; chomp $markdown; $markdown =~ s/^\s+//gm;
+    my $file          = $markdown_base . ( $filename =~ /\.md$/ ? $filename : "${filename}.md" );
+    my $data          = deserialize_file $file, { format => 'markdown' } 
+        or croak "render(): File $file not found!";
 
     return {
-        prototype => $frontmatter->{ prototype } // 'default',
-        title     => $frontmatter->{ title } . ' - ' . $config->{ site }{ title },
+        prototype => $data->{ prototype } // 'default',
+        title     => $data->{ title } . ' - ' . $config->{ site }{ title },
         site      => $config->{ site },
         menu      => $config->{ menu },
-        post      => $frontmatter,
+        post      => $data,
         author    => $config->{ author },
         widgets   => $config->{ widgets },
-        output    => markdown( $markdown ),
+        output    => markdown( $data->{ _content } ),
         permalink => $self->permalink( $args->{ uri }),
     };
 }

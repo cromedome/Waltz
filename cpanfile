@@ -8,6 +8,7 @@ requires "Path::Tiny"             => "0";
 requires "Moo"                    => "0";
 requires "URI"                    => "0";
 requires 'Feature::Compat::Try';
+requires 'File::Serialize';
 
 recommends "YAML"                    => "0";
 recommends "URL::Encode::XS"         => "0";
