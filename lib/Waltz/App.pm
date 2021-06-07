@@ -54,7 +54,6 @@ get '/' => sub { forward '/index'; };
 # engine.
 get '/**' => sub {
     my( $route ) = splat;
-    debug "ROUTE IS " . join( '/', $route->@* );
 
     my $page = do{
         try {
