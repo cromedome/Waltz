@@ -46,9 +46,7 @@ get '/settings' => sub {
         'Static dir: ' . join( ', ', setting 'public_dir' );
 };
 
-get '/' => sub {
-    template 'index' => { 'title' => 'Waltz' };
-};
+get '/' => sub { forward '/index'; };
 
 # Here's the crux of the development server app. Look for a markdown file
 # with the name and relative path provided, parse the metadata, render 
@@ -56,6 +54,7 @@ get '/' => sub {
 # engine.
 get '/**' => sub {
     my( $route ) = splat;
+    debug "ROUTE IS " . join( '/', $route->@* );
 
     my $page = do{
         try {
