@@ -1,0 +1,37 @@
+<div id="main" role="main">
+    <p>I AM A DEFAULT POST</p>
+    <article id="post">
+      <div class="post-container">
+        <h1><a href="[% permalink %]">[% post.title %]</a></h1>
+
+        <div id="post-metadata">
+          <span id="post-date">
+            <time datetime="[% post.date %]">
+              [% IF post.updated %]
+                [% date.format( post.updated ) %]
+              [% ELSE %]
+                [% date.format( post.date ) %]
+              [% END %]
+            </time>
+          </span>
+
+          <span id="post-categories">
+            [% FOREACH category IN post.categories %]
+            <a href="/category/[% category %]">[% category | ucfirst %]</a>
+          </span>
+          [% END %]
+        </div>
+
+        <div id="post-body">
+          [% post.description %]
+          [% output %]
+        </div>
+
+        <div id="post-tags">
+          [% FOREACH tag IN post.tags %]
+              [% tag %] 
+          [% END %]
+        </div>
+      </div>
+    </article>
+</div>
