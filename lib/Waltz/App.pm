@@ -44,6 +44,19 @@ get '/version' => sub { return 'Version ' . $Waltz::VERSION; };
 # something and won't find it, resulting in a 404.
 get '/' => sub { forward '/index'; };
 
+# I am not sure about these when it comes to static rendering. Do I combine
+# these routes with the megasplat route, because that is how the renderer will
+# handle them? For now, keep them separate, and let the renderer do it's thing...
+# I will sort the rest out later.
+get '/categories' => sub {  };
+get '/category/:category' => sub {  };
+get '/tags' => sub { 
+    template  'tags', {
+        title => 'Tags',
+    };
+};
+get '/tag/:tag' => sub {  };
+
 # Here's the crux of the development server app. Try to render a markdown
 # file using the path and filename provided as HTML, and wrap it all in
 # our layout and templating engine.
@@ -67,6 +80,15 @@ get '/**' => sub {
         }
     };
     template $page->{ prototype }, $page;
+};
+
+# We use config information on every page. No need to set it manually 
+# every time.
+hook before_template_render => sub( $tokens ) {
+    $tokens->{ site    } = config->{ site };
+    $tokens->{ menu    } = config->{ menu };
+    $tokens->{ author  } = config->{ author };
+    $tokens->{ widgets } = config->{ widgets };
 };
 
 true;

@@ -37,13 +37,9 @@ sub render( $self, $args ) {
         or croak "render(): File $file not found!";
 
     return {
+        post      => $data,
         prototype => $data->{ prototype } // 'default',
         title     => $data->{ title } . ' - ' . $config->{ site }{ title },
-        site      => $config->{ site },
-        menu      => $config->{ menu },
-        post      => $data,
-        author    => $config->{ author },
-        widgets   => $config->{ widgets },
         output    => markdown( $data->{ _content } ),
         permalink => $self->permalink( $args->{ uri }),
     };
@@ -58,6 +54,8 @@ sub permalink( $self, $path ) {
 sub render_all( $self ) {
     #my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]});
 
+    # TODO: cache tags, articles we see. Write a dir/page out for all tags, and one for each
+    # TODO: cache categories, articles we see. Write a dir/page out for all cats, and one for each
     ## File output
     #$template->process(
         #$page->{ page } . '.tt',
