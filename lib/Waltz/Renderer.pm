@@ -27,6 +27,7 @@ has config => (
 # Render a single file as markdown, return a hashref with the content and
 # metadata.
 sub render( $self, $args ) {
+    # TODO: check for page in cache and if cached page is valid
     my $config = $args->{ config } // $self->config;  
     croak "render(): missing blog configuration!" unless $config;
 
@@ -36,6 +37,7 @@ sub render( $self, $args ) {
     my $data          = deserialize_file $file, { format => 'markdown' } 
         or croak "render(): File $file not found!";
 
+    # TODO: Update page in cache
     return {
         post      => $data,
         prototype => $data->{ prototype } // 'default',
@@ -54,6 +56,7 @@ sub permalink( $self, $path ) {
 sub render_all( $self ) {
     #my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]});
 
+    # TODO: optionally rerender despite cache status
     # TODO: cache tags, articles we see. Write a dir/page out for all tags, and one for each
     # TODO: cache categories, articles we see. Write a dir/page out for all cats, and one for each
     ## File output
