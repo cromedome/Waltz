@@ -2,7 +2,6 @@ use v5.20;
 use strictures 2;
 use Test::More;
 use Test::WWW::Mechanize::PSGI;
-
 use Cwd;
 
 my $cwd;
