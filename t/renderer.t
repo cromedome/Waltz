@@ -5,17 +5,16 @@ use Test::WWW::Mechanize::PSGI;
 use Cwd;
 use YAML qw( Load );
 
+my $cwd;
+BEGIN {
+    $cwd = getcwd;
+    chdir 't' unless $cwd =~ /t$/;
+    $ENV{ DANCER_VIEWS   } = "$cwd/views";
+    $ENV{ DANCER_CONFDIR } = $cwd;
+    #$ENV{ DANCER_PUBLIC } = "$cwd/views";
+}
+
 use Waltz::Renderer;
-
-my $cwd = getcwd;
-
-#BEGIN {
-    #my $cwd = getcwd;
-    #chdir 't' unless $cwd =~ /t$/;
-    #$ENV{ DANCER_VIEWS } = "$cwd/views";
-    #$ENV{ DANCER_CONFDIR } = $cwd;
-    #$ENV{ DANCER_APPDIR } = $cwd;
-#}
 
 # Render fails with no config
 #my $no_config_render = Waltz::Renderer
