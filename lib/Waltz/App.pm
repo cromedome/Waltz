@@ -15,15 +15,6 @@ use Waltz::Renderer;
 
 # TODO: Template::AutoFilter
 
-# The goal here is to pigeon hole us into our site content directory. I am not
-# sure yet about letting a user specify what directory they want content to
-# come from. Seems a bit dangerous. 
-#set appdir => '/Users/jason/src/Waltz/app/share/';
-#set confdir => '/Users/jason/src/Waltz/app/share/';
-#set views => '/Users/jason/src/Waltz/app/share/views';
-#set public_dir => '/Users/jason/src/Waltz/app/share/static';
-#set static_handler => true;
-
 # Don't create the renderer any more than we have to. It's not that expensive, 
 # but still... why? If we need to communicate anything to the user at runtime,
 # this is a good place to do it.
