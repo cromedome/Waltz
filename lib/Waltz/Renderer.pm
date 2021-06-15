@@ -6,6 +6,7 @@ use strictures 2;
 use feature qw( signatures );
 no warnings qw( experimental::signatures );
 
+use Feature::Compat::Try;
 use Cwd;
 use URI;
 use Carp qw( carp croak );
@@ -14,6 +15,9 @@ use File::Serialize { pretty => 1 };
 use Text::Markdown qw( markdown );
 use Data::Printer;
 
+# The goal here is to pigeon hole us into our site content directory. I am not
+# sure yet about letting a user specify what directory they want content to
+# come from. Seems a bit dangerous. 
 has basedir => (
     is      => 'ro',
     default => sub { getcwd(); },
@@ -28,9 +32,6 @@ has config => (
 # metadata.
 sub render( $self, $args ) {
     # TODO: check for page in cache and if cached page is valid
-    my $config = $args->{ config } // $self->config;  
-    croak "render(): missing blog configuration!" unless $config;
-
     my $filename      = $args->{ filename } or croak "render(): need a filename to render!";
     my $markdown_base = $self->basedir . '/content/';
     my $file          = $markdown_base . ( $filename =~ /\.md$/ ? $filename : "${filename}.md" );
@@ -38,18 +39,29 @@ sub render( $self, $args ) {
         or croak "render(): File $file not found!";
 
     # TODO: Update page in cache
+    my $title = $data->{ title } // '';
+    $title = ( $title eq '' ? '' : ' - ') . $self->config->{ site }{ title };
+
     return {
         post      => $data,
         prototype => $data->{ prototype } // 'default',
-        title     => $data->{ title } . ' - ' . $config->{ site }{ title },
+        title     => $title,
         output    => markdown( $data->{ _content } ),
         permalink => $self->permalink( $args->{ uri }),
     };
 }
 
 sub permalink( $self, $path ) {
-    my $uri = URI->new_abs( $path, $self->config->{ site }{ url } )
-        or carp "permalink(): Missing URI, can't generate permalink!";
+    carp "permalink(): Missing URI, can't generate permalink!" unless $path;
+
+    my $uri = do{
+        try {
+            URI->new_abs( $path, $self->config->{ site }{ url } );
+        } catch( $e ) {
+            croak "permalink: can't make a valid URI!" if $e =~ /Missing base argument/;
+        }
+    }; 
+
     return $uri->as_string;
 }
 
@@ -67,6 +79,13 @@ sub render_all( $self ) {
     #);
 
     return $self->render;
+}
+
+sub BUILD {
+    my $self = shift;
+
+    my $config = $self->config;  
+    croak "Renderer: missing blog configuration!" unless $config;
 }
 
 1;
