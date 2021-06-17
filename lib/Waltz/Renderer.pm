@@ -11,6 +11,7 @@ use Cwd;
 use URI;
 use Carp qw( carp croak );
 use Template;
+use Path::Tiny;
 use File::Serialize { pretty => 1 };
 use Text::Markdown qw( markdown );
 use Data::Printer;
@@ -66,19 +67,50 @@ sub permalink( $self, $path ) {
 }
 
 sub render_all( $self ) {
-    #my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]});
+    my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]});
+    my %stats; # Num pages, time elapsed, cache stats, what else?
 
     # TODO: optionally rerender despite cache status
     # TODO: cache tags, articles we see. Write a dir/page out for all tags, and one for each
     # TODO: cache categories, articles we see. Write a dir/page out for all cats, and one for each
-    ## File output
-    #$template->process(
-        #$page->{ page } . '.tt',
-        #$vars,
-        #"public/${name}.html",
-    #);
+    # TODO: Move static content to public. Use remove_path?
+    my $dir_iter = path( $self->basedir . '/content' )->iterator({ recurse => 1 });
+    while( my $md_file = $dir_iter->() ) {
+        # TODO: _index.md
+        my $basename = $md_file->relative( 'content' ); $basename =~ s/\.md$//g;
+        next if $md_file !~ /\.md$/;
 
-    return $self->render;
+        my $output_file = "public/${basename}.html";
+        say "INPUT FILENAME: $basename, OUTPUT FILENAME: $output_file";
+
+        path( $output_file )->touchpath unless path( $output_file )->exists;
+
+        # TODO: try/catch error checking
+        # TODO: split dir from filename
+        my $page_data = $self->render({
+            filename => $basename,
+            uri      => $basename,
+        });
+        
+        my $vars = {};
+
+        #my $page;
+        #$template->process(
+            #$page_data->{ prototype } . '.tt',
+            #$vars,
+            #\$page,
+        #);
+
+        ## Now, do the page frame. Write out to disk, do the next page.
+        #$vars->{ content } = $page;
+        #$template->process(
+            #$page->{ page } . '.tt', # TODO: Fix this
+            #$vars,
+            #$output_file,
+        #);
+    }
+
+    return \%stats;
 }
 
 sub BUILD {
