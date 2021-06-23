@@ -11,6 +11,7 @@ requires 'Feature::Compat::Try';
 requires 'File::Serialize';
 requires 'Dancer2::Plugin::Syntax::ParamKeywords';
 requires 'CHI';
+requires 'Time::HiRes';
 
 recommends "YAML"                    => "0";
 recommends "URL::Encode::XS"         => "0";

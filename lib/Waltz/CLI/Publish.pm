@@ -9,6 +9,7 @@ use CLI::Osprey
     desc => 'Publish a site to static HTML files.';
 
 use Waltz::Renderer;
+use Data::Printer;
 
 my $cwd;
 BEGIN {
@@ -18,10 +19,12 @@ BEGIN {
     $ENV{ DANCER_PUBLIC  } = "$cwd/static";
 }
 
+# TODO: debug mode, list files
 sub run {
     my $config   = LoadFile $ENV{ DANCER_CONFDIR } . "/config.yml";
     my $renderer = Waltz::Renderer->new({ basedir => $cwd, config => $config });
-    $renderer->render_all;
+    my $stats    = $renderer->render_all;
+    p $stats;
 }
 
 1;

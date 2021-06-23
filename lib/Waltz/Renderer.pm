@@ -14,6 +14,7 @@ use Template;
 use Path::Tiny;
 use File::Serialize { pretty => 1 };
 use Text::Markdown qw( markdown );
+use Time::HiRes qw( gettimeofday tv_interval );
 use Data::Printer;
 
 # The goal here is to pigeon hole us into our site content directory. I am not
@@ -68,16 +69,17 @@ sub permalink( $self, $path ) {
         try {
             URI->new_abs( $path, $self->config->{ site }{ url } );
         } catch( $e ) {
-            croak "permalink: can't make a valid URI!" if $e =~ /Missing base argument/;
+            croak "permalink(): can't make a valid URI!" if $e =~ /Missing base argument/;
         }
     }; 
 
     return $uri->as_string;
 }
 
-# TODO: debug mode, list files
 sub render_all( $self ) {
-    my %stats; # Num pages, time elapsed, cache stats, what else?
+    # Stats include num pages, time elapsed, cache stats, what else?
+    my %files; # Filename => time to render (s)
+    my $start_time = [ gettimeofday ];
 
     # TODO: optionally rerender despite cache status
     # TODO: cache tags, articles we see. Write a dir/page out for all tags, and one for each
@@ -85,6 +87,7 @@ sub render_all( $self ) {
     # TODO: Move static content to public. Use remove_path?
     my $dir_iter = path( $self->basedir . '/content' )->iterator({ recurse => 1 });
     while( my $md_file = $dir_iter->() ) {
+        my $page_start = [ gettimeofday ];
         my $basename = $md_file->relative( 'content' ); $basename =~ s/\.md$//g;
         next if $md_file !~ /\.md$/;
 
@@ -95,17 +98,20 @@ sub render_all( $self ) {
         } else {
             $output_file .= "${basename}/index.html";
         }
-        say "INPUT FILENAME: $basename, OUTPUT FILENAME: $output_file";
 
         path( $output_file )->touchpath unless path( $output_file )->exists;
 
-        # TODO: try/catch error checking
-        my $page_data = $self->render({
-            filename => $basename,
-            uri      => $basename,
-        });
+        my $page_data = do{
+            try {
+                $self->render({
+                    filename => $basename,
+                    uri      => $basename,
+                });
+            } catch( $e ) {
+                say STDERR $e;
+            }
+        };
 
-        # TODO: render_tt method? Render to scalar, return. Use path::tiny to write to disk?
         my $config = $self->config;
         my $vars   = {
             site    => $config->{ site },
@@ -120,7 +126,6 @@ sub render_all( $self ) {
             vars     => $vars,
         });
 
-        # Now, do the page frame. Write out to disk, do the next page.
         $vars->{ content } = $page;
         $page = $self->_render_template({
             filename => 'layouts/main', # TODO: make this frontmatter
@@ -128,9 +133,14 @@ sub render_all( $self ) {
         });
 
         path( $output_file )->spew_utf8([ $page ]);
+        $files{ $output_file } = tv_interval( $page_start, [ gettimeofday ] );
     }
 
-    return \%stats;
+    return {
+        num_pages  => scalar keys %files,
+        files      => \%files,
+        total_time => tv_interval( $start_time, [ gettimeofday ] ),
+    };
 }
 
 # Stupidly simple, but DRY.
