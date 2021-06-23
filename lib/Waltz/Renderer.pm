@@ -29,6 +29,13 @@ has config => (
     default => sub{ return {} },
 );
 
+# Don't make a template object unless we have to, but don't create it again
+# if we already have one lying around.
+has template => (
+    is      => 'lazy',
+    default => sub { my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]}); }
+);
+
 # Render a single file as markdown, return a hashref with the content and
 # metadata.
 sub render( $self, $args ) {
@@ -38,16 +45,18 @@ sub render( $self, $args ) {
     my $file          = $markdown_base . ( $filename =~ /\.md$/ ? $filename : "${filename}.md" );
     my $data          = deserialize_file $file, { format => 'markdown' } 
         or croak "render(): File $file not found!";
-
+    
     # TODO: Update page in cache
     my $title = $data->{ title } // '';
     $title = ( $title eq '' ? '' : ' - ') . $self->config->{ site }{ title };
+
+    my $content = defined $data->{ _content } ? markdown( $data->{ _content } ) : '';
 
     return {
         post      => $data,
         prototype => $data->{ prototype } // 'default',
         title     => $title,
-        output    => markdown( $data->{ _content } ),
+        output    => $content,
         permalink => $self->permalink( $args->{ uri }),
     };
 }
@@ -66,8 +75,8 @@ sub permalink( $self, $path ) {
     return $uri->as_string;
 }
 
+# TODO: debug mode, list files
 sub render_all( $self ) {
-    my $template = Template->new({ INCLUDE_PATH => [ 'views/' ]});
     my %stats; # Num pages, time elapsed, cache stats, what else?
 
     # TODO: optionally rerender despite cache status
@@ -76,41 +85,68 @@ sub render_all( $self ) {
     # TODO: Move static content to public. Use remove_path?
     my $dir_iter = path( $self->basedir . '/content' )->iterator({ recurse => 1 });
     while( my $md_file = $dir_iter->() ) {
-        # TODO: _index.md
         my $basename = $md_file->relative( 'content' ); $basename =~ s/\.md$//g;
         next if $md_file !~ /\.md$/;
 
-        my $output_file = "public/${basename}.html";
+        my $output_file = 'public/';
+        if( $basename =~ /index$/ ) {
+            $output_file .= "${basename}.html"; 
+            $output_file =~ s/_//g;
+        } else {
+            $output_file .= "${basename}/index.html";
+        }
         say "INPUT FILENAME: $basename, OUTPUT FILENAME: $output_file";
 
         path( $output_file )->touchpath unless path( $output_file )->exists;
 
         # TODO: try/catch error checking
-        # TODO: split dir from filename
         my $page_data = $self->render({
             filename => $basename,
             uri      => $basename,
         });
-        
-        my $vars = {};
 
-        #my $page;
-        #$template->process(
-            #$page_data->{ prototype } . '.tt',
-            #$vars,
-            #\$page,
-        #);
+        # TODO: render_tt method? Render to scalar, return. Use path::tiny to write to disk?
+        my $config = $self->config;
+        my $vars   = {
+            site    => $config->{ site },
+            menu    => $config->{ menu },
+            author  => $config->{ author },
+            widgets => $config->{ widgets },
+            output  => $page_data->{ output },
+        };
 
-        ## Now, do the page frame. Write out to disk, do the next page.
-        #$vars->{ content } = $page;
-        #$template->process(
-            #$page->{ page } . '.tt', # TODO: Fix this
-            #$vars,
-            #$output_file,
-        #);
+        my $page = $self->_render_template({
+            filename => $page_data->{ prototype },
+            vars     => $vars,
+        });
+
+        # Now, do the page frame. Write out to disk, do the next page.
+        $vars->{ content } = $page;
+        $page = $self->_render_template({
+            filename => 'layouts/main', # TODO: make this frontmatter
+            vars     => $vars,
+        });
+
+        path( $output_file )->spew_utf8([ $page ]);
     }
 
     return \%stats;
+}
+
+# Stupidly simple, but DRY.
+sub _render_template( $self, $args ) {
+    my $filename = $args->{ filename } . '.tt' 
+        or croak "_render_template(): no template filename given!";
+
+    my $vars = $args->{ vars } or croak "_render_template(): No content provided!";
+
+    $self->template->process(
+        $filename, 
+        $vars,
+        \my $page,
+    );
+
+    return $page;
 }
 
 sub BUILD {
