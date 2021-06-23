@@ -113,23 +113,24 @@ sub render_all( $self ) {
         };
 
         my $config = $self->config;
-        my $vars   = {
+        my %vars   = (
             site    => $config->{ site },
             menu    => $config->{ menu },
             author  => $config->{ author },
             widgets => $config->{ widgets },
-            output  => $page_data->{ output },
-        };
+            #output  => $page_data->{ output },
+        );
+        %vars = ( %vars, $page_data->%* );
 
         my $page = $self->_render_template({
             filename => $page_data->{ prototype },
-            vars     => $vars,
+            vars     => \%vars,
         });
 
-        $vars->{ content } = $page;
+        $vars{ content } = $page;
         $page = $self->_render_template({
             filename => 'layouts/main', # TODO: make this frontmatter
-            vars     => $vars,
+            vars     => \%vars,
         });
 
         path( $output_file )->spew_utf8([ $page ]);
