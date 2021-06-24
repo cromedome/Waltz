@@ -56,6 +56,7 @@ sub render( $self, $args ) {
     return {
         post      => $data,
         prototype => $data->{ prototype } // 'default',
+        layout    => $data->{ layout    } // 'layouts/main',
         title     => $title,
         output    => $content,
         permalink => $self->permalink( $args->{ uri }),
@@ -118,9 +119,8 @@ sub render_all( $self ) {
             menu    => $config->{ menu },
             author  => $config->{ author },
             widgets => $config->{ widgets },
-            #output  => $page_data->{ output },
         );
-        %vars = ( %vars, $page_data->%* );
+        %vars = ( %vars, $page_data->%* ); # Merge page data with TT variables
 
         my $page = $self->_render_template({
             filename => $page_data->{ prototype },
@@ -129,7 +129,7 @@ sub render_all( $self ) {
 
         $vars{ content } = $page;
         $page = $self->_render_template({
-            filename => 'layouts/main', # TODO: make this frontmatter
+            filename => $vars{ layout }, 
             vars     => \%vars,
         });
 
