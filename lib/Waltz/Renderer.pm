@@ -82,6 +82,8 @@ sub render_all( $self ) {
     my $start_time = [ gettimeofday ];
 
     # TODO: optionally rerender despite cache status
+    
+    # categories => datetime => { url, title } (same for tags)
     # TODO: cache tags, articles we see. Write a dir/page out for all tags, and one for each
     # TODO: cache categories, articles we see. Write a dir/page out for all cats, and one for each
 
@@ -94,7 +96,7 @@ sub render_all( $self ) {
         my $new_dir = path( 'public/' . $static_file->relative( 'static' ) )->parent;
         path( $new_dir )->mkpath unless path( $new_dir )->exists;
         $static_file->copy( $new_dir . '/' . $static_file->basename );
-        push @static_files, $static_file;
+        push @static_files, $static_file->stringify;
     }
 
     # Turn Markdown into magic (well, HTML at least)! This is the bulk of the work.
