@@ -79,13 +79,26 @@ sub permalink( $self, $path ) {
 
 sub render_all( $self ) {
     # Stats include num pages, time elapsed, cache stats, what else?
-    my %files; # Filename => time to render (s)
     my $start_time = [ gettimeofday ];
 
     # TODO: optionally rerender despite cache status
     # TODO: cache tags, articles we see. Write a dir/page out for all tags, and one for each
     # TODO: cache categories, articles we see. Write a dir/page out for all cats, and one for each
-    # TODO: Move static content to public. Use remove_path?
+
+    # Move static content to public. Use remove_path?
+    my @static_files;
+    my $static_iter = path( 'static' )->iterator({ recurse => 1 });
+    while( my $static_file = $static_iter->() ) {
+        next if $static_file->is_dir;
+
+        my $new_dir = path( 'public/' . $static_file->relative( 'static' ) )->parent;
+        path( $new_dir )->mkpath unless path( $new_dir )->exists;
+        $static_file->copy( $new_dir . '/' . $static_file->basename );
+        push @static_files, $static_file;
+    }
+
+    # Turn Markdown into magic (well, HTML at least)! This is the bulk of the work.
+    my %md_files; # Filename => time to render (s)
     my $dir_iter = path( $self->basedir . '/content' )->iterator({ recurse => 1 });
     while( my $md_file = $dir_iter->() ) {
         my $page_start = [ gettimeofday ];
@@ -134,13 +147,15 @@ sub render_all( $self ) {
         });
 
         path( $output_file )->spew_utf8([ $page ]);
-        $files{ $output_file } = tv_interval( $page_start, [ gettimeofday ] );
+        $md_files{ $output_file } = tv_interval( $page_start, [ gettimeofday ] );
     }
 
     return {
-        num_pages  => scalar keys %files,
-        files      => \%files,
-        total_time => tv_interval( $start_time, [ gettimeofday ] ),
+        num_pages        => scalar keys %md_files,
+        num_static_files => scalar @static_files,
+        static_files     => \@static_files,
+        md_files         => \%md_files,
+        total_time       => tv_interval( $start_time, [ gettimeofday ] ),
     };
 }
 
