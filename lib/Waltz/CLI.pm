@@ -1,9 +1,15 @@
 package Waltz::CLI;
 
+use v5.20;
 use Moo;
+use strictures 2;
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
+
 use CLI::Osprey;
 use File::Share 'dist_dir';
 use Module::Runtime 'use_module';
+use Text::Table::Tiny qw( generate_table );
 
 # TODO: All of these
 subcommand version   => 'Waltz::CLI::Version';
@@ -28,9 +34,16 @@ has _dist_dir => (
     builder => sub{ dist_dir('Waltz') },
 );
 
-sub run {
-    my $self = shift;
+sub run( $self ) {
     return $self->osprey_usage;
+}
+
+sub display_stats( $self, $stats ) {
+    my @rows = ( [ qw/ Statistic Time(s) / ] );
+    push @rows, [ '# of Markdown Files Generated', $stats->{ num_pages } ];
+    push @rows, [ '# of static Files Published', $stats->{ num_static_files } ];
+    push @rows, [ 'Total Time (secs)', $stats->{ total_time } ];
+    say generate_table( rows => \@rows, header_row => 1 );
 }
 
 1;

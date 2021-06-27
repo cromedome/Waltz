@@ -12,6 +12,7 @@ requires 'File::Serialize';
 requires 'Dancer2::Plugin::Syntax::ParamKeywords';
 requires 'CHI';
 requires 'Time::HiRes';
+requires 'Text::Table::Tiny';
 
 recommends "YAML"                    => "0";
 recommends "URL::Encode::XS"         => "0";
