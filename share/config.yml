@@ -1,30 +1,55 @@
 # === Basic configuration ===
-
 site:
-  # Your sites's name
-  appname: "testblog"
+    # The URL for the site home
+    url: "https://your.blog"
 
-  # Blog title
-  title: 'A Test Blog'
+    # Your sites's name
+    appname: "testblog"
 
-  # Author name
-  author: 'John Doe'
-  
-  # Avatar filename/URL
-  avatar: 'gravatar'
+    # Blog title
+    title: 'A Test Blog'
 
-    # Hero image/URL
-  hero: "something.png"
+    # Coyright information
+    copyright: "Copyright &copy; 2021. All rights reserved."
 
-  copyright: " "
+    # Number of items per page
+    paginate: 5
 
-social:
-    github: "PerlDancer"
-    twitter: "PerlDancer"
-    linkedin: none
-    facebook: none
-    instagram: none
+    # License to use (Apache, Artistic, CC, etc.)
+    license: ""
 
+    # Show comment counts
+    comment_count: true
+
+    # Show gdpr info?
+    gdpr: false
+
+author:
+    # Avatar filename/URL, or gravatar
+    avatar: 'gravatar'
+
+    # Hero image URL
+    hero: ""
+
+    # Biographical info
+    name: 'John Doe'
+    bio: "Someone of remarkable character"
+    location: "Smallville, Your State, USA"
+
+    social:
+        sharing: true
+        github: "PerlDancer"
+        twitter: "PerlDancer"
+        linkedin: none
+        facebook: none
+        instagram: none
+
+# === Widget configuration ===
+widgets:
+    disqus:
+        shortname: test
+
+# === Waltz/Dancer specific - don't change unless you know what you're doing! ===
 # The default layout to use for your application (located in
 # views/layouts/main.tt)
 layout: "main"
@@ -34,8 +59,7 @@ layout: "main"
 # about unicode within your app when this setting is set (recommended).
 charset: "UTF-8"
 
-# === Engines ===
-
+# Engine config
 template: "template_toolkit"
 engines:
     template:
@@ -43,6 +67,6 @@ engines:
             # Note: start_tag and end_tag are regexes
             #start_tag: '[%'
             #end_tag:   '%]'
-            start_tag: '{{'
-            end_tag:   '}}'
+            start_tag: '\{\{'
+            end_tag:   '\}\}'
 

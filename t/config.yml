@@ -1,0 +1,29 @@
+---
+site:
+    url: "https://test.blog"
+    appname: "test.blog"
+    title: 'Waltz Test Blog'
+    paginate: 5
+    copyright: "Copyright &copy; Jason A. Crome 2021"
+    license: ""
+    comment_count: true
+    gdpr: false
+    locale: "en_US"
+
+author:
+    name: 'Jason A. Crome'
+    bio: "Perl hacker, Dancer developer, entrepreneur, pilot, hockey player"
+    location: "Charlotte, North Carolina, USA"
+    email: 'jason@crome-plated.com'
+
+layout: "main"
+
+charset: "UTF-8"
+
+template: "template_toolkit"
+engines:
+    template:
+        template_toolkit:
+            start_tag: '[%'
+            end_tag:   '%]'
+

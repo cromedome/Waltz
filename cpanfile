@@ -5,6 +5,14 @@ requires "Text::Markdown"         => "0";
 requires "App::Wallflower"        => "0";
 requires "CLI::Osprey"            => "0";
 requires "Path::Tiny"             => "0";
+requires "Moo"                    => "0";
+requires "URI"                    => "0";
+requires 'Feature::Compat::Try';
+requires 'File::Serialize';
+requires 'Dancer2::Plugin::Syntax::ParamKeywords';
+requires 'CHI';
+requires 'Time::HiRes';
+requires 'Text::Table::Tiny';
 
 recommends "YAML"                    => "0";
 recommends "URL::Encode::XS"         => "0";
@@ -34,7 +42,12 @@ feature 'accelerate', 'Accelerate Dancer2 app performance with XS modules' => su
 };
 
 on "test" => sub {
-    requires "Test::More"            => "0";
-    requires "HTTP::Request::Common" => "0";
+    requires "Test::Most"                 => "0";
+    requires "HTTP::Request::Common"      => "0";
+    requires "Test::WWW::Mechanize::PSGI" => "0";
+};
+
+on "develop" => sub {
+    requires "Data::Printer" => "0";
 };
 
