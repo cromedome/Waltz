@@ -20,7 +20,7 @@ subcommand version   => 'Waltz::CLI::Version';
 #subcommand plaintext => 'Waltz::CLI::Plaintext';
 subcommand publish   => 'Waltz::CLI::Publish'; # Create static content
 #subcommand deploy    => 'Waltz::CLI::Deploy'; # Implies publish. Push to render, Netlify, GitHub, etc.
-subcommand dev       => 'Waltz::CLI::Dev';
+subcommand server    => 'Waltz::CLI::Server';
 #subcommand bootstrap => 'Waltz::CLI::Bootstrap';
 
 # Thinking ahead, these might be useful in future subcommands

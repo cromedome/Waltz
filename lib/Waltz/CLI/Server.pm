@@ -1,4 +1,4 @@
-package Waltz::CLI::Dev;
+package Waltz::CLI::Server;
 
 use v5.20;
 use strictures 2;
